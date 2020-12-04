@@ -108,7 +108,6 @@ public class PasswordManager {
             
             if(obj != null) {
                 if(obj.getClass().getName().equals("lib_password_management.PasswordManager$UserData")) {
-                    System.out.println("confronto: " + ID + " con " + ((PasswordManager.UserData) obj).getID() + " --> " + ID.equals(((PasswordManager.UserData) obj).getID()));
                     equals = ID.equals(((PasswordManager.UserData) obj).getID());
                 }
             }

@@ -2,7 +2,12 @@ import lib_password_management.PasswordManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -183,26 +188,18 @@ public class Main {
         if(accounts.size() == 0) {
             return true;
         } else {
-            System.out.println("risultato del confronto: " + (accounts.indexOf(new PasswordManager.UserData(ID, "password", false, "", "")) != -1));
             return accounts.indexOf(new PasswordManager.UserData(ID, "password", false, "", "")) == -1;
         }
     }
     
     private static void saveOnFile(PasswordManager.UserData user, String filename) {
-        PrintWriter outputStream = null;
+        Path path = Paths.get(ACCOUNT_FILE);
         
         try {
-            outputStream = new PrintWriter(filename);
-            
-            outputStream.println(user.toString());
-        } catch (FileNotFoundException e) {
+            Files.write(path, (user.toString() + "\n").getBytes(), StandardOpenOption.APPEND);  //Append mode
+        } catch (IOException e) {
             e.printStackTrace();
             throw new Error(e.getMessage());
-        } finally {
-            if(outputStream != null) {
-                outputStream.flush();
-                outputStream.close();
-            }
         }
     }
 }
