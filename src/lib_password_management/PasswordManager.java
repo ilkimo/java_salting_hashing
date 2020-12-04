@@ -107,12 +107,9 @@ public class PasswordManager {
             boolean equals = false;
             
             if(obj != null) {
-                System.out.println("PERFECT1! REMOVE ME class name " + obj.getClass().getName());//TODO cancellami
                 if(obj.getClass().getName().equals("lib_password_management.PasswordManager$UserData")) {
                     equals = ID.equals(((PasswordManager.UserData) obj).getID());
                 }
-            } else {
-                System.out.println("shit1");//TODO cancellami
             }
             
             return equals;
@@ -123,12 +120,9 @@ public class PasswordManager {
             int comparison = -1;
             
             if(other != null) {
-                System.out.println("PERFECT2! REMOVE ME class name " + other.getClass().getName());//TODO cancellami
                 if(other.getClass().getName().equals("lib_password_management.PasswordManager$UserData")) {
                     comparison = ID.compareTo(((PasswordManager.UserData) other).getID());
                 }
-            } else {
-                System.out.println("shit2");//TODO cancellami
             }
             
             return comparison;

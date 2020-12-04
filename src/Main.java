@@ -14,6 +14,7 @@ public class Main {
     private static final String USER_STOP_EVENT_MESSAGE = "user wants to exit";
     private static final String ACCOUNT_FILE = "passwords.txt";
     private static final String GOODBYE_MESSAGE = "bye bye motherfucker!";
+    private static Scanner t = new Scanner(System.in);
     
     /**
      * just a toy for trying to create accounts and make log in-s and verify that the
@@ -95,12 +96,9 @@ public class Main {
     }
     
     private static String askChoice() {
-        Scanner t = null;
         String choice= "";
         
         try {
-            t = new Scanner(System.in);
-    
             System.out.println("What do you want to do?");
             System.out.println("\t" + REGISTER_ACCOUNT + " --> register account");
             System.out.println("\t" + LOGIN + " --> log-in existing account");
@@ -111,10 +109,6 @@ public class Main {
             choice = t.nextLine();
         } catch(Exception e) {
             throw e;
-        } finally {
-            if(t != null) {
-                t.close();
-            }
         }
     
         return choice;
@@ -152,19 +146,14 @@ public class Main {
     
     private static String getID(ArrayList<PasswordManager.UserData> accounts) throws Exception {
         String ID = "";
-        Scanner keyboard = null;
         
         try {
-            keyboard = new Scanner(System.in);
-    
-            //keyboard.nextLine(); //to throw rubbish away //TODO cancellami
-            
             System.out.print("Insert ID (write 'EXIT' to exit): ");
-            ID = keyboard.nextLine();
-            System.out.println("e fin qui ci siamo"); //TODO CANCELLAMI
+            ID = t.nextLine();
+            
             while(!((ID.equalsIgnoreCase("EXIT")) | (validID(ID, accounts)))) {
                 System.out.print("this ID already exists, try another (write 'EXIT' to exit): ");
-                ID = keyboard.nextLine();
+                ID = t.nextLine();
             }
     
             if(ID.equalsIgnoreCase("EXIT")) {
@@ -172,10 +161,6 @@ public class Main {
             }
         } catch(Exception e) {
             throw e;
-        } finally {
-            if(keyboard != null) {
-                keyboard.close();
-            }
         }
         
         return ID;
@@ -183,19 +168,12 @@ public class Main {
     
     private static String getPassword() {
         String password = "";
-        Scanner t = null;
     
         try {
-            t = new Scanner(System.in);
-    
             System.out.print("Insert password: ");
             password = t.nextLine();
         } catch(Exception e) {
         
-        } finally {
-            if(t != null) {
-                t.close();
-            }
         }
         
         return password;
