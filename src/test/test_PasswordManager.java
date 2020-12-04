@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
@@ -35,7 +36,7 @@ public class test_PasswordManager {
     }
     
     @Test
-    public void test_register_and_login() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public void test_getRandomSalt() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Method getSalt;
         String str;
     
@@ -61,8 +62,53 @@ public class test_PasswordManager {
     }
     
     @Test
-    public void test() {
-        assertEquals(1, 1);
-        System.out.println("jaa");
+    public void test_register_and_login() {
+        String[] mails = new String[] {
+                "mario.rossi@gmail.com", "luigi.verdi@gmail.com", "gianfranco.lu@gmail.com",
+                "pino.ponzi@gmail.com", "jerp.lorp@gmail.com", "manuela.genchi@gmail.com",
+                "sorin.abdari@gmail.com", "abdullah.west@gmail.com", "dom.tomato@gmail.com",
+                "jason.paul@gmail.com", "daniel.gerp@gmail.com", "walterri.luomahoo@gmail.com",
+                "ginco.rasi@gmail.com", "arianna.masi@gmail.com", "lucian.domine@gmail.com"
+        };
+        
+        String[] passwords = new String[] {
+                "password", "otherPassword", "super Diff1cult password",
+                "acif83sl sa}[[", "vehsiudrhtwie7", "qwerty",
+                "LARndsosOHo948{[;", "sdoijtwo488878HU f", "yeppAJSDI82 dw",
+                "a", "pass", "pas"
+        };
+        
+        int[] associated_passwords = new int[mails.length];
+        
+        Random r = new Random();
+        
+        for(int i = 0; i < mails.length; i++) {
+            associated_passwords[i] = r.nextInt(passwords.length);
+        }
+        
+        //REGISTER
+        
+        for(int i = 0; i < mails.length; i++) {
+            assertEquals(true, passwordManager.registerUser(mails[i], passwords[associated_passwords[i]]));
+        }
+        
+        for(int i = 0; i < mails.length; i++) {
+            assertEquals(false, passwordManager.registerUser(mails[i], passwords[associated_passwords[i]]));
+        }
+        
+        //LOGIN
+        
+        for(int i = 0; i < mails.length; i++) {
+            int valid_logins = 0;
+            
+            for(int j = 0; j < passwords.length; j++) {
+                if(passwordManager.loginUser(mails[i], passwords[j])) {
+                    assertEquals(associated_passwords[i], j);
+                    valid_logins++;
+                }
+            }
+            
+            assertEquals(1, valid_logins);
+        }
     }
 }

@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -65,6 +64,7 @@ public class PasswordManager {
                         user_data_separator, users_separator, user_data_file);
         
                 user.saveOnFile();
+                userList.add(user);
                 created = true;
             }
         }
