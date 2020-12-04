@@ -27,10 +27,11 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
-        PasswordManager passManager = new PasswordManager(ACCOUNT_FILE, USER_DATA_SEPARATOR, USERS_SEPARATOR);
+        PasswordManager passManager;
         String choice = "";
         
         try {
+            passManager = new PasswordManager(ACCOUNT_FILE, USER_DATA_SEPARATOR, USERS_SEPARATOR);
             choice = askChoice();
     
             while(choice.equals(REGISTER_ACCOUNT) || choice.equals(LOGIN)) {

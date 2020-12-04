@@ -21,7 +21,7 @@ public class PasswordManager {
     private final String users_separator;
     private ArrayList<UserData> userList;
     
-    public PasswordManager(String user_data_file, String user_data_separator, String users_separator) {
+    public PasswordManager(String user_data_file, String user_data_separator, String users_separator) throws IOException {
         this.user_data_file = user_data_file;
         this.user_data_separator = user_data_separator;
         this.users_separator = users_separator;
@@ -29,10 +29,12 @@ public class PasswordManager {
         init();
     }
     
-    private void init() {
+    private void init() throws IOException {
         String[] strings_accounts;
         userList = new ArrayList<>();
-    
+        
+        createFileIfNotExists(user_data_file);
+        
         strings_accounts = readFile().split(users_separator);
     
         for(String str : strings_accounts) {
@@ -177,6 +179,12 @@ public class PasswordManager {
         }
         
         return file_content;
+    }
+    
+    private void createFileIfNotExists(String filename) throws IOException {
+        File file = new File(user_data_file);
+    
+        file.createNewFile(); //if file exists, does nothing and returns false
     }
     
     private class UserData implements Comparable {
