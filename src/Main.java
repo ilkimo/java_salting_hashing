@@ -27,34 +27,23 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
-        String[] strings_accounts = null;
-        ArrayList<PasswordManager.UserData> accounts = new ArrayList<>();
+        PasswordManager passManager = new PasswordManager(ACCOUNT_FILE, USER_DATA_SEPARATOR, USERS_SEPARATOR);
         String choice = "";
         
         try {
-            strings_accounts = readFile(ACCOUNT_FILE).split(USERS_SEPARATOR);
-            
-            for(String str : strings_accounts) {
-                String[] values = str.split(USER_DATA_SEPARATOR);
-                
-                if(values != null && values.length == 3) {
-                    accounts.add(new PasswordManager.UserData(values[0], values[1], values[2], true, USER_DATA_SEPARATOR, USERS_SEPARATOR));
-                } else {
-                    // ignore wrong line
-                }
-            }
-            
             choice = askChoice();
     
             while(choice.equals(REGISTER_ACCOUNT) || choice.equals(LOGIN)) {
                 switch(choice) {
                     case REGISTER_ACCOUNT -> {
-                        if(register(accounts)) {
+                        if(register(passManager)) {
                             System.out.println("Registration complete! Inserted in file " + ACCOUNT_FILE);
+                        } else {
+                            System.out.println("SORRY, ID ALREADY IN USE");
                         }
                     }
                     case LOGIN -> {
-                        if(login(accounts)) {
+                        if(login(passManager)) {
                             System.out.println("YOU LOGGED IN SUCCESFULLY!");
                         } else {
                             System.out.println("Sorry, the password is wrong, ACCESS DENIED!");
@@ -76,45 +65,37 @@ public class Main {
         }
     }
     
-    private static boolean register(ArrayList<PasswordManager.UserData> accounts) throws Exception {
+    private static boolean register(PasswordManager passwordManager) throws Exception {
         boolean success = false;
+        String ID, password;
         
-        if(accounts != null) {
-            PasswordManager.UserData user = getUserData(accounts);
-            accounts.add(user);
+        if(passwordManager != null) {
+            System.out.print("Insert new account ID: ");
+            ID = t.nextLine();
+            System.out.print("Insert new account password: ");
+            password = t.nextLine();
             
-            saveOnFile(user, ACCOUNT_FILE);
-            success = true;
+            success = passwordManager.registerUser(ID, password);
         } else {
-            throw new Error("Error: accounts is null pointer!");
+            throw new Error("Error: passwordManager is null pointer!");
         }
         
         return success;
     }
     
-    private static boolean login(ArrayList<PasswordManager.UserData> accounts) {
+    private static boolean login(PasswordManager passwordManager) {
         boolean valid_login = false;
+        String ID, password;
         
-        if(accounts != null) {
-            if(accounts.size() == 0) {
-                valid_login = false;
-            } else {
-                String ID = "", password = "";
-                
-                System.out.print("Insert ID: ");
-                ID = t.nextLine();
-                System.out.print("Insert password: ");
-                password = t.nextLine();
-        
-                int index = getAccountIndex(ID, accounts);
-                if(index != -1) {
-                    String hashed_password = (new PasswordManager.UserData(ID, accounts.get(index).getSalt(), password, false, USER_DATA_SEPARATOR, USERS_SEPARATOR)).getHashedPassword();
-                    valid_login = hashed_password.equals(accounts.get(index).getHashedPassword());
-                }
-                
-            }
+        if(passwordManager != null) {
+            System.out.print("Insert ID: ");
+            ID = t.nextLine();
+            System.out.print("Insert password: ");
+            password = t.nextLine();
+            
+            valid_login = passwordManager.loginUser(ID, password);
         } else {
-            throw new Error("Error: accounts is null pointer!");
+            throw new Error("Error: passwordManager is null pointer!");
         }
         
         return valid_login;
@@ -137,97 +118,5 @@ public class Main {
         }
     
         return choice;
-    }
-    
-    private static String readFile(String filename) {
-        String file_content = "";
-        Scanner inputStream = null;
-        
-        try {
-            inputStream = new Scanner(new File(filename));
-            
-            while(inputStream.hasNextLine()) {
-                file_content += inputStream.nextLine();
-            }
-        } catch(Exception e) {
-            e.printStackTrace();
-            throw new Error(e.getMessage());
-        } finally {
-            if(inputStream != null) {
-                inputStream.close();
-            }
-        }
-        
-        return file_content;
-    }
-    
-    private static PasswordManager.UserData getUserData(ArrayList<PasswordManager.UserData> accounts) throws Exception {
-        String ID, password;
-        
-        ID = getID(accounts);
-        password = getPassword();
-        return new PasswordManager.UserData(ID, password, false, USER_DATA_SEPARATOR, USERS_SEPARATOR);
-    }
-    
-    private static String getID(ArrayList<PasswordManager.UserData> accounts) throws Exception {
-        String ID = "";
-        
-        try {
-            System.out.print("Insert ID (write 'EXIT' to exit): ");
-            ID = t.nextLine();
-            
-            while(!((ID.equalsIgnoreCase("EXIT")) || (validID(ID, accounts)))) {
-                System.out.print("this ID already exists, try another (write 'EXIT' to exit): ");
-                ID = t.nextLine();
-            }
-    
-            if(ID.equalsIgnoreCase("EXIT")) {
-                throw new Exception("Exception: " + USER_STOP_EVENT_MESSAGE);
-            }
-        } catch(Exception e) {
-            throw e;
-        }
-        
-        return ID;
-    }
-    
-    private static String getPassword() {
-        String password = "";
-    
-        try {
-            System.out.print("Insert password: ");
-            password = t.nextLine();
-        } catch(Exception e) {
-        
-        }
-        
-        return password;
-    }
-    
-    private static boolean validID(String ID, ArrayList<PasswordManager.UserData> accounts) {
-        if(accounts.size() == 0) {
-            return true;
-        } else {
-            return accounts.indexOf(new PasswordManager.UserData(ID, "password", false, "", "")) == -1;
-        }
-    }
-    
-    private static void saveOnFile(PasswordManager.UserData user, String filename) {
-        Path path = Paths.get(ACCOUNT_FILE);
-        
-        try {
-            Files.write(path, (user.toString() + "\n").getBytes(), StandardOpenOption.APPEND);  //Append mode
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new Error(e.getMessage());
-        }
-    }
-    
-    private static int getAccountIndex(String ID, ArrayList<PasswordManager.UserData> accounts) {
-        if(accounts.size() == 0) {
-            return -1;
-        } else {
-            return accounts.indexOf(new PasswordManager.UserData(ID, "template_password", false, "", ""));
-        }
     }
 }
