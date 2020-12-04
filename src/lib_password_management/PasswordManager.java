@@ -143,8 +143,8 @@ public class PasswordManager {
         }
     
         res = new String(bytes);
-        res.replaceAll(users_separator, "");
-        res.replaceAll(user_data_separator, "");
+        res = res.replaceAll(users_separator, "");
+        res = res.replaceAll(user_data_separator, "");
         return res;
     }
     

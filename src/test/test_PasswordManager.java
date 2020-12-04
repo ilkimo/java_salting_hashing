@@ -19,6 +19,8 @@ import static org.junit.Assert.assertEquals;
 public class test_PasswordManager {
     private static final String TEST_FILE_ACCOUNTS = "test_accounts.txt";
     private static PasswordManager passwordManager;
+    private static final String USERS_SEPARATOR = ";";
+    private static final String USER_DATA_SEPARATOR = " ";
     
     @Before
     public void create_file_or_just_clean_it() throws IOException {
@@ -35,6 +37,7 @@ public class test_PasswordManager {
     @Test
     public void test_register_and_login() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Method getSalt;
+        String str;
     
         try {
             // creating a reflection of the private method, to be able to test it
@@ -44,8 +47,12 @@ public class test_PasswordManager {
         
             // invoke wraps the returned value in it's wrapper class (if it is a primitive type) int --> Integer
             // first param is ignored if the function to invoke is static.
-            for(int i = 0; i < 200; i++) {
-                System.out.println(i + " salt: " + getSalt.invoke(passwordManager, ";", " "));
+            for(int i = 0; i < 20000; i++) {
+                str = (String) getSalt.invoke(passwordManager, USERS_SEPARATOR, USER_DATA_SEPARATOR);
+    
+                //check that no USERS_SEPARATOR or IGNORE2 remains in the Strings
+                assertEquals(-1, str.indexOf(USERS_SEPARATOR));
+                assertEquals(-1, str.indexOf(USER_DATA_SEPARATOR));
             }
         
         } catch(Exception e) {
