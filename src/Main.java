@@ -56,6 +56,8 @@ public class Main {
                     case LOGIN -> {
                         if(login(accounts)) {
                             System.out.println("YOU LOGGED IN SUCCESFULLY!");
+                        } else {
+                            System.out.println("Sorry, the password is wrong, ACCESS DENIED!");
                         }
                     }
                 }
@@ -91,13 +93,31 @@ public class Main {
     }
     
     private static boolean login(ArrayList<PasswordManager.UserData> accounts) {
+        boolean valid_login = false;
+        
         if(accounts != null) {
-            //TODO
+            if(accounts.size() == 0) {
+                valid_login = false;
+            } else {
+                String ID = "", password = "";
+                
+                System.out.print("Insert ID: ");
+                ID = t.nextLine();
+                System.out.print("Insert password: ");
+                password = t.nextLine();
+        
+                int index = getAccountIndex(ID, accounts);
+                if(index != -1) {
+                    String hashed_password = (new PasswordManager.UserData(ID, accounts.get(index).getSalt(), password, false, USER_DATA_SEPARATOR, USERS_SEPARATOR)).getHashedPassword();
+                    valid_login = hashed_password.equals(accounts.get(index).getHashedPassword());
+                }
+                
+            }
         } else {
             throw new Error("Error: accounts is null pointer!");
         }
         
-        return false; //TODO
+        return valid_login;
     }
     
     private static String askChoice() {
@@ -200,6 +220,14 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
             throw new Error(e.getMessage());
+        }
+    }
+    
+    private static int getAccountIndex(String ID, ArrayList<PasswordManager.UserData> accounts) {
+        if(accounts.size() == 0) {
+            return -1;
+        } else {
+            return accounts.indexOf(new PasswordManager.UserData(ID, "template_password", false, "", ""));
         }
     }
 }
