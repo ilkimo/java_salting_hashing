@@ -151,7 +151,7 @@ public class Main {
             System.out.print("Insert ID (write 'EXIT' to exit): ");
             ID = t.nextLine();
             
-            while(!((ID.equalsIgnoreCase("EXIT")) | (validID(ID, accounts)))) {
+            while(!((ID.equalsIgnoreCase("EXIT")) || (validID(ID, accounts)))) {
                 System.out.print("this ID already exists, try another (write 'EXIT' to exit): ");
                 ID = t.nextLine();
             }
@@ -183,7 +183,8 @@ public class Main {
         if(accounts.size() == 0) {
             return true;
         } else {
-            return accounts.indexOf(new PasswordManager.UserData(ID, "password", false, "", "")) != -1;
+            System.out.println("risultato del confronto: " + (accounts.indexOf(new PasswordManager.UserData(ID, "password", false, "", "")) != -1));
+            return accounts.indexOf(new PasswordManager.UserData(ID, "password", false, "", "")) == -1;
         }
     }
     
