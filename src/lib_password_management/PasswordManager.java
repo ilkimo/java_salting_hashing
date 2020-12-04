@@ -11,11 +11,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
 public class PasswordManager {
     private static final String ALGORYTHM = "SHA-256";
-    private static final int SALT_DIM = 16;
+    private static final int SALT_DIM = 100;
     private final String user_data_file;
     private final String user_data_separator;
     private final String users_separator;
@@ -129,14 +130,21 @@ public class PasswordManager {
     }
     
     private static String getRandomSalt(String users_separator, String user_data_separator) {
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[SALT_DIM];
-        random.nextBytes(salt);
+        Random r = new Random();
+        byte[] bytes = new byte[SALT_DIM];
+        String res = "";
         
-        String res = new String(salt);
+        for(int i = 0; i < SALT_DIM; i++) {
+            bytes[i] = (byte) (r.nextInt((int) ('}' - '0')) + '0');
+            
+            if(((int) bytes[i]) == '\\') {
+                bytes[i] = (byte) (((int) bytes[i] )+ 1);
+            }
+        }
+    
+        res = new String(bytes);
         res.replaceAll(users_separator, "");
         res.replaceAll(user_data_separator, "");
-        
         return res;
     }
     
