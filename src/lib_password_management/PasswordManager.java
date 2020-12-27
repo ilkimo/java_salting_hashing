@@ -33,13 +33,13 @@ public class PasswordManager {
         String[] strings_accounts;
         userList = new ArrayList<>();
         
-        createFileIfNotExists(user_data_file);
+        createFileIfNotExists();
         
         strings_accounts = readFile().split(users_separator);
-    
+        
         for(String str : strings_accounts) {
             String[] values = str.split(user_data_separator);
-        
+            
             if(values.length == 3) {
                 userList.add(new UserData(values[0], values[1], values[2], true, user_data_separator, users_separator, user_data_file));
             } else {
@@ -60,11 +60,11 @@ public class PasswordManager {
         boolean created = false;
         UserData user;
         
-        synchronized(this) { //TODO #01 implement LETTORI-SCRITTORI synchronizaton?
+        synchronized(this) {
             if(!ID_taken(ID)) {
                 user = new UserData(ID, NOT_hashed_password, false,
                         user_data_separator, users_separator, user_data_file);
-        
+                
                 user.saveOnFile();
                 userList.add(user);
                 created = true;
@@ -84,16 +84,17 @@ public class PasswordManager {
         boolean valid_login = false;
         int index;
         
-        synchronized(this) { //TODO #01 implement LETTORI-SCRITTORI synchronizaton?
+        synchronized(this) {
             if(userList != null) {
                 index = userList.indexOf(new UserData(ID, "template_password",
                         true, "", "", ""));
-    
+                
                 if(index != -1) {
                     String hashed_password = (new PasswordManager.UserData(ID, userList.get(index).getSalt(), password, false, "", "", "")).getHashedPassword();
                     valid_login = hashed_password.equals(userList.get(index).getHashedPassword());
                 }
             } else {
+                System.out.println("Following error comes from PasswordManager.loginUser()");
                 throw new Error("Error: accounts is null pointer!");
             }
         }
@@ -125,8 +126,8 @@ public class PasswordManager {
         }
         
         String res = sb.toString();
-        res.replaceAll(users_separator, "");
-        res.replaceAll(user_data_separator, "");
+        res = res.replaceAll(users_separator, "");
+        res = res.replaceAll(user_data_separator, "");
         
         return res;
     }
@@ -143,7 +144,7 @@ public class PasswordManager {
                 bytes[i] = (byte) (((int) bytes[i] )+ 1);
             }
         }
-    
+        
         res = new String(bytes);
         res = res.replaceAll(users_separator, "");
         res = res.replaceAll(user_data_separator, "");
@@ -154,8 +155,8 @@ public class PasswordManager {
         if(userList.size() == 0) {
             return false;
         } else {
-            return userList.indexOf(new UserData(ID, "template_password",
-                    true, "", "", "")) != -1;
+            return userList.contains(new UserData(ID, "template_password",
+                    true, "", "", ""));
         }
     }
     
@@ -170,6 +171,7 @@ public class PasswordManager {
                 file_content += inputStream.nextLine();
             }
         } catch(Exception e) {
+            System.out.println("Following error comes from PasswordManager.readFile");
             e.printStackTrace();
             throw new Error(e.getMessage());
         } finally {
@@ -181,9 +183,9 @@ public class PasswordManager {
         return file_content;
     }
     
-    private void createFileIfNotExists(String filename) throws IOException {
+    private void createFileIfNotExists() throws IOException {
         File file = new File(user_data_file);
-    
+        
         file.createNewFile(); //if file exists, does nothing and returns false
     }
     
@@ -208,7 +210,7 @@ public class PasswordManager {
                 setPassword(password, true);
             }
         }
-    
+        
         public UserData(String ID, String salt, String password, boolean password_already_hashed,
                         String user_data_separator, String users_separator, String user_data_file) {
             this.ID = ID;
@@ -227,7 +229,7 @@ public class PasswordManager {
         public String getID() { return ID; }
         public String getSalt() { return salt; }
         public String getHashedPassword() { return hashed_password; }
-    
+        
         /**
          * hashes the given password and saves the hashed_password in the object attributes,
          * if generateRandomSalt is true, the salt gets generated randomly, otherwise the
@@ -239,16 +241,16 @@ public class PasswordManager {
             if(generateRandomSalt) {
                 salt = getRandomSalt(users_separator, user_data_separator);
             }
-        
+            
             hashed_password = hash(NOT_hashed_password, salt, users_separator, user_data_separator);
         }
-    
+        
         /**
          * Saves this UserData object appending it at the associated file
          */
         private void saveOnFile() {
             Path path = Paths.get(user_data_file);
-        
+            
             try {
                 Files.write(path, (toString() + "\n").getBytes(), StandardOpenOption.APPEND);  //Append mode
             } catch (IOException e) {
@@ -262,27 +264,27 @@ public class PasswordManager {
             boolean equals = false;
             
             if(obj != null) {
-                if(obj.getClass().getName().equals("lib_password_management.PasswordManager$UserData")) {
+                if(obj.getClass().getName().equals(this.getClass().getName())) {
                     equals = ID.equals(((PasswordManager.UserData) obj).getID());
                 }
             }
             
             return equals;
         }
-    
+        
         @Override
         public int compareTo(Object other) {
             int comparison = -1;
             
             if(other != null) {
-                if(other.getClass().getName().equals("lib_password_management.PasswordManager$UserData")) {
+                if(other.getClass().getName().equals(this.getClass().getName())) {
                     comparison = ID.compareTo(((PasswordManager.UserData) other).getID());
                 }
             }
             
             return comparison;
         }
-    
+        
         @Override
         public String toString() {
             return ID + user_data_separator +
